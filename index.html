@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            touch-action: none;
+            overflow: hidden;
+        }
+        .workflow-card {
+            touch-action: pan-x;
+            cursor: grab;
+            transition: transform 0.3s ease-out;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #4CAF50 0%, #2196F3 100%);
+        }
+        .workflow-container {
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            z-index: 10;
+            padding: 1rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 50%;
+        }
+        .left-arrow {
+            left: 1rem;
+        }
+        .right-arrow {
+            right: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="workflow-container">
+        <div class="arrow left-arrow" id="leftArrow">
+            <i class="bi bi-chevron-left"></i>
+        </div>
+        
+        <div class="arrow right-arrow" id="rightArrow">
+            <i class="bi bi-chevron-right"></i>
+        </div>
+
+        <div id="workflowCard" class="workflow-card absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-96 rounded-xl shadow-2xl">
+            <div class="gradient-bg h-full w-full rounded-xl p-6 flex flex-col justify-between">
+                <div class="text-white">
+                    <h2 class="text-2xl font-bold mb-2">Workflow Editor</h2>
+                    <p class="text-sm opacity-80">Create and manage your workflows</p>
+                </div>
+                
+                <div class="flex flex-col gap-4">
+                    <button class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                        Create New Workflow
+                    </button>
+                    <button class="bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors">
+                        View Workflows
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const card = document.getElementById('workflowCard');
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        // Touch events
+        card.addEventListener('touchstart', handleTouchStart);
+        card.addEventListener('touchmove', handleTouchMove);
+        card.addEventListener('touchend', handleTouchEnd);
+
+        // Mouse events
+        card.addEventListener('mousedown', handleMouseDown);
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+
+        // Arrow buttons
+        document.getElementById('leftArrow').addEventListener('click', () => swipeCard('left'));
+        document.getElementById('rightArrow').addEventListener('click', () => swipeCard('right'));
+
+        function handleTouchStart(e) {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+            currentX = 0;
+        }
+
+        function handleTouchMove(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            const moveX = e.touches[0].clientX - startX;
+            currentX = moveX;
+            card.style.transform = `translate(-50%, -50%) translateX(${moveX}px)`;
+        }
+
+        function handleTouchEnd() {
+            isDragging = false;
+            if (Math.abs(currentX) > 100) {
+                swipeCard(currentX > 0 ? 'right' : 'left');
+            } else {
+                card.style.transform = 'translate(-50%, -50%)';
+            }
+        }
+
+        function handleMouseDown(e) {
+            startX = e.clientX;
+            isDragging = true;
+            currentX = 0;
+        }
+
+        function handleMouseMove(e) {
+            if (!isDragging) return;
+            const moveX = e.clientX - startX;
+            currentX = moveX;
+            card.style.transform = `translate(-50%, -50%) translateX(${moveX}px)`;
+        }
+
+        function handleMouseUp() {
+            if (!isDragging) return;
+            isDragging = false;
+            if (Math.abs(currentX) > 100) {
+                swipeCard(currentX > 0 ? 'right' : 'left');
+            } else {
+                card.style.transform = 'translate(-50%, -50%)';
+            }
+        }
+
+        function swipeCard(direction) {
+            const distance = direction === 'left' ? -1000 : 1000;
+            card.style.transform = `translate(-50%, -50%) translateX(${distance}px)`;
+            
+            setTimeout(() => {
+                card.style.transition = 'none';
+                card.style.transform = `translate(-50%, -50%) translateX(${-distance}px)`;
+                
+                setTimeout(() => {
+                    card.style.transition = 'transform 0.3s ease-out';
+                    card.style.transform = 'translate(-50%, -50%)';
+                }, 50);
+            }, 300);
+
+            // Here you can add navigation logic based on direction
+            if (direction === 'left') {
+                console.log('Navigating left');
+                // Add navigation logic here
+            } else {
+                console.log('Navigating right');
+                // Add navigation logic here
+            }
+        }
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
